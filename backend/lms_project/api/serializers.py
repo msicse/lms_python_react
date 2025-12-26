@@ -25,3 +25,17 @@ class ProfileSerializer(serializers.ModelSerializer):
         model = User
         fields = ('email', 'full_name', 'role')
         read_only_fields = ('email', 'role')
+
+
+class LoginSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=True)
+    password = serializers.CharField(required=True, write_only=True)
+
+    def validate(self, data):
+        email = data.get('email')
+        password = data.get('password')
+
+        if not email or not password:
+            raise serializers.ValidationError("Email and password are required.")
+        
+        return data

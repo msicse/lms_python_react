@@ -8,7 +8,7 @@ from django.conf import settings
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .serializers import RegisterSerializer, ProfileSerializer
+from .serializers import RegisterSerializer, ProfileSerializer, LoginSerializer
 from accounts.models import User
 
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -34,21 +34,38 @@ class LoginAPIView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
-        email = request.data.get('email')
-        password = request.data.get('password')
+        serializer = LoginSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+        email = serializer.validated_data.get('email')
+        password = serializer.validated_data.get('password')
 
-        user  = authenticate(request, email=email, password=password)
+        user = authenticate(request, email=email, password=password)
         if not user:
             return Response(
                 {"error": "Invalid email or password"}, 
                 status=status.HTTP_401_UNAUTHORIZED
             )
+        
+        # Check if user is active
+        if not user.is_active:
+            return Response(
+                {"error": "This account is inactive"}, 
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
         refresh = RefreshToken.for_user(user)
         return Response(
             {
+                "message": "Login successful",
                 "access": str(refresh.access_token),
                 "refresh": str(refresh),
-                "role": user.role,
+                "user": {
+                    "email": user.email,
+                    "full_name": user.full_name,
+                    "role": user.role,
+                }
             },
             status=status.HTTP_200_OK
         )
