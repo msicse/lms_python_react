@@ -12,6 +12,11 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 
 from pathlib import Path
 from datetime import timedelta
+import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -21,12 +26,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-8r3uvc(qh-o&%898v6n!t001+y$&_gp$4g-u-1g9g_&(9=*ffb'
+SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-8r3uvc(qh-o&%898v6n!t001+y$&_gp$4g-u-1g9g_&(9=*ffb')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',') if os.getenv('ALLOWED_HOSTS') else []
 
 
 # Application definition
@@ -127,6 +132,12 @@ STATIC_URL = 'static/'
 # Custom User Model
 AUTH_USER_MODEL = 'accounts.User' 
 
+# Authentication Backends
+AUTHENTICATION_BACKENDS = [
+    'accounts.backends.EmailBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
+
 # REST Framework Configuration
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -142,20 +153,15 @@ SIMPLE_JWT = {
 }
 
 # Email Configuration (for password reset)
-# For development, use console backend (prints to terminal)
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-
-# For production, configure SMTP:
-# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-# EMAIL_HOST = 'smtp.gmail.com'
-# EMAIL_PORT = 587
-# EMAIL_USE_TLS = True
-# EMAIL_HOST_USER = 'your-email@gmail.com'
-# EMAIL_HOST_PASSWORD = 'your-app-password'
-# DEFAULT_FROM_EMAIL = 'your-email@gmail.com'
-
-DEFAULT_FROM_EMAIL = 'noreply@lms.com'
-FRONTEND_URL = 'http://localhost:3000'  # Adjust to your React app URL
+# Load from environment variables
+EMAIL_BACKEND = os.getenv('EMAIL_BACKEND', 'django.core.mail.backends.console.EmailBackend')
+EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.gmail.com')
+EMAIL_PORT = int(os.getenv('EMAIL_PORT', '587'))
+EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True') == 'True'
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'noreply@lms.com')
+FRONTEND_URL = os.getenv('FRONTEND_URL', 'http://localhost:5174')
 
 # CORS Settings
 CORS_ALLOWED_ORIGINS = [

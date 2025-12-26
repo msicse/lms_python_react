@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { isAuthenticated } from '../services/api';
+import Navbar from '../components/Navbar';
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -68,11 +69,13 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 px-4">
-      <div className="max-w-md w-full bg-white rounded-lg shadow-xl p-8">
-        <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-gray-800">Welcome Back</h2>
-          <p className="text-gray-600 mt-2">Sign in to your learner account</p>
+    <div className="min-h-screen bg-gray-50">
+      <Navbar />
+      <div className="flex items-center justify-center min-h-[calc(100vh-64px)] px-4">
+      <div className="max-w-md w-full bg-white rounded-lg shadow-md p-6">
+        <div className="text-center mb-6">
+          <h2 className="text-2xl font-bold text-gray-800">Welcome Back</h2>
+          <p className="text-gray-600 text-sm mt-1">Sign in to your account</p>
         </div>
 
         {success && (
@@ -128,9 +131,9 @@ const Login = () => {
               />
               <span className="ml-2 text-sm text-gray-600">Remember me</span>
             </label>
-            <a href="#" className="text-sm text-blue-600 hover:text-blue-700">
+            <Link to="/forgot-password" className="text-sm text-blue-600 hover:text-blue-700">
               Forgot password?
-            </a>
+            </Link>
           </div>
 
           <button
@@ -145,11 +148,12 @@ const Login = () => {
         <div className="mt-6 text-center">
           <p className="text-sm text-gray-600">
             Don't have an account?{' '}
-            <a href="/register" className="text-blue-600 hover:text-blue-700 font-medium">
+            <Link to="/register" className="text-blue-600 hover:text-blue-700 font-medium">
               Sign up
-            </a>
+            </Link>
           </p>
         </div>
+      </div>
       </div>
     </div>
   );

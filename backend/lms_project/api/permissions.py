@@ -24,3 +24,12 @@ class IsStudent(BasePermission):
 
     def has_permission(self, request, view):
         return request.user and request.user.is_authenticated and request.user.role == 'student'
+
+
+class IsInstructorOrAdmin(BasePermission):
+    """
+    Custom permission to allow both instructors and admins to access certain views.
+    """
+
+    def has_permission(self, request, view):
+        return request.user and request.user.is_authenticated and request.user.role in ['instructor', 'admin']

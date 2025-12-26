@@ -3,13 +3,27 @@ from accounts.models import User
 
 
 class RegisterSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True)
+    password = serializers.CharField(write_only=True, min_length=8)
 
     class Meta:
         model = User
         fields = ('email', 'full_name', 'role', 'password')
+        read_only_fields = ('role',)  # Role is auto-set to student
+
+    def validate_role(self, value):
+        # Only allow student role during public registration
+        # Instructors and admins must be created by existing admins
+        if value not in ['student', None]:
+            raise serializers.ValidationError(
+                "Public registration is only available for students. "
+                "Contact an administrator to create instructor or admin accounts."
+            )
+        return value
 
     def create(self, validated_data):
+        # Force role to be student for public registration
+        validated_data['role'] = 'student'
+        
         user = User(
             email=validated_data['email'],
             full_name=validated_data['full_name'],
